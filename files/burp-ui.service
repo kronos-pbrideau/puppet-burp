@@ -1,0 +1,11 @@
+[Unit]
+Description=burp-ui init script
+After=network.target
+
+[Service]
+User=burp-ui
+ExecStart=/usr/local/bin/burp-ui -c /etc/burp-ui/burp-ui.conf
+Type=idle
+
+[Install]
+WantedBy=multi-user.target
