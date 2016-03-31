@@ -39,6 +39,7 @@ class burp::ui::install (
           ],
           command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} burp-ui",
           unless  => "pip freeze | grep 'burp-ui==${burpui_version}'",
+          notify  => Service['burp-ui'],
         }
         exec { 'install ldap3' :
           require => [
