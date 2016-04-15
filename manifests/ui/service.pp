@@ -19,7 +19,7 @@ class burp::ui::service (
             }
             file { 'burp-ui init' :
               path    => '/etc/init.d/burp-ui',
-              content => template('burp/burp-ui.init.erb')
+              content => template('burp/burp-ui.init.erb'),
               notify  => Exec['burp-ui-systemd-reload'],
               mode    => '0755',
             }
@@ -27,7 +27,7 @@ class burp::ui::service (
           'systemd' : {
             file { 'burp-ui init' :
               path    => '/lib/systemd/system/burp-ui.service',
-              content => template('burp/burp-ui.service.erb')
+              content => template('burp/burp-ui.service.erb'),
               notify  => Exec['burp-ui-systemd-reload'],
             }
           }
