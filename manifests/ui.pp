@@ -51,7 +51,7 @@ class burp::ui (
   class { ::burp::ui::service :
     manage_service      => $manage_service,
     service_provider    => 'builtin',
-    builtin_init_script => 'sysv',
+    builtin_init_script => $service_builtin_init_script,
   }
 
   Class['::burp::ui::install'] ->
