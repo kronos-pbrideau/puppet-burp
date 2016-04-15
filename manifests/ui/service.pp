@@ -2,7 +2,7 @@ class burp::ui::service (
   $manage_service      = true,
   $service_provider    = 'builtin',
   $builtin_init_script = 'sysv',
-) {
+) inherits burp::ui::params {
 
   if $manage_service {
     case $service_provider {
@@ -19,16 +19,16 @@ class burp::ui::service (
             }
             file { 'burp-ui init' :
               path    => '/etc/init.d/burp-ui',
-              source  => 'puppet:///modules/burp/burp-ui.init',
+              content => template('burp/burp-ui.init.erb')
               notify  => Exec['burp-ui-systemd-reload'],
               mode    => '0755',
             }
           }
           'systemd' : {
             file { 'burp-ui init' :
-              path   => '/lib/systemd/system/burp-ui.service',
-              source => 'puppet:///burp/burp-ui.service',
-              notify => Exec['burp-ui-systemd-reload'],
+              path    => '/lib/systemd/system/burp-ui.service',
+              content => template('burp/burp-ui.service.erb')
+              notify  => Exec['burp-ui-systemd-reload'],
             }
           }
           default   : { fail('init_script must be one of sysv or systemd') }
