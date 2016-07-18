@@ -2,7 +2,7 @@ class burp::ui::install (
   $package_provider  = 'aptitude',
   $wheelhouse_source = 'puppet:///modules/burp/ui-wheelhouse',
   $wheelhouse_path   = '/opt/burp-ui_wheelhouse',
-  $burpui_version    = '0.1.3',
+  $burpui_version    = '0.2.1',
 ) {
 
   if $burp::ui::manage_package {
