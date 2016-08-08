@@ -31,11 +31,20 @@ class burp::ui::install (
             Exec['install burp-ui'] ~> Service['gunicorn']
             Exec['install ldap3'] ~> Service['gunicorn']
             Exec['install gevent'] ~> Service['gunicorn']
+            if $::burp::ui::redis {
+              Exec['install redis'] ~> Service['gunicorn']
+              Exec['install Flask-Session'] ~> Service['gunicorn']
+            }
+
           }
           'builtin' : {
             Exec['install burp-ui'] ~> Service['burp-ui']
             Exec['install ldap3'] ~> Service['burp-ui']
             Exec['install gevent'] ~> Service['burp-ui']
+            if $::burp::ui::redis {
+              Exec['install redis'] ~> Service['burp-ui']
+              Exec['install Flask-Session'] ~> Service['burp-ui']
+            }
           }
         }
 
@@ -62,6 +71,25 @@ class burp::ui::install (
           ],
           command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} gevent",
           unless  => "pip show gevent | grep '^Version: ${gevent_version}'",
+        }
+
+        if $::burp::ui::redis {
+          exec { 'install redis' :
+            require => [
+              File[$wheelhouse_path],
+              Package['python-pip'],
+            ],
+            command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} redis",
+            unless  => "pip show redis | grep '^Version: ${redis_version}'",
+          }
+          exec { 'install Flask-Session' :
+            require => [
+              File[$wheelhouse_path],
+              Package['python-pip'],
+            ],
+            command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} Flask-Session",
+            unless  => "pip show Flask-Session | grep '^Version: ${flasksession_version}'",
+          }
         }
       }
 
