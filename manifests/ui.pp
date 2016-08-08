@@ -20,6 +20,7 @@ class burp::ui (
 
   $config_folder               = '/etc/burp-ui',
   $config_file                 = '/etc/burp-ui/burp-ui.conf',
+  $log_file                    = '/var/log/burpui.log',
 
   $configuration               = {},
 
