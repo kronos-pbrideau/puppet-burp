@@ -3,9 +3,9 @@ Description=burp-ui init script
 After=network.target
 
 [Service]
-User=burp-ui
-ExecStart=<%= @burp_ui_binary_path %> -c /etc/burp-ui/burp-ui.conf
-
+User=<%= scope.lookupvar('burp::ui::user') %>
+Group=<%= scope.lookupvar('burp::ui::group') %>
+ExecStart=<%= @binary_path %> --config <%= scope.lookupvar('burp::ui::config_file')%> --logfile /var/log/burp/ui.log -vvvv --debug
 Type=idle
 
 [Install]

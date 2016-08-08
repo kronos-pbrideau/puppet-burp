@@ -6,7 +6,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: backup and restore program
-# Description:       Burp-UI is a web-ui for burp backup written in 
+# Description:       Burp-UI is a web-ui for burp backup written in
 #                    python with Flask and jQuery/Bootstrap
 #                    Author Ziirish <ziirish@ziirish.info>
 ### END INIT INFO
@@ -16,12 +16,12 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC=burp-ui          # Introduce a short description here
 NAME=burp-ui          # Introduce the short server's name here
-DAEMON=<%= @burp_ui_binary_path %> # Introduce the server's location here
-DAEMON_ARGS=""             # Arguments to run the daemon with
+DAEMON=<%= @binary_path %> # Introduce the server's location here
+DAEMON_ARGS="--config <%= scope.lookupvar('burp::ui::config_file')%> --logfile <%= scope.lookupvar('burp::ui::log_file')%>"
 PIDFILE=/var/run/burp.ui.pid
 SCRIPTNAME=/etc/init.d/$NAME
-UID=burp-ui
-GID=burp-ui
+UID=<%= scope.lookupvar('burp::ui::user') %>
+GID=<%= scope.lookupvar('burp::ui::group') %>
 
 # Exit if the package is not installed
 [ -x $DAEMON ] || exit 0

@@ -1,7 +1,8 @@
 class burp::ui::config (
   $configuration = {},
 ) {
-  require burp::server
+
+  require burp::ui
 
   if $::burp::ui::manage_user {
     # This user must have access to burp client configs and private keys for backup download
@@ -12,23 +13,28 @@ class burp::ui::config (
       managehome => false,
       shell      => '/usr/sbin/nologin',
       system     => true,
-      groups     => 'burp',
-      require    => User['burp'],
+      groups     => $::burp::ui::group,
     }
   }
 
   file { $::burp::ui::config_folder :
     ensure => directory,
-    owner  => 'burp-ui',
-    group  => 'burp-ui',
+    owner  => $::burp::ui::user,
+    group  => $::burp::ui::group,
     mode   => '0640',
   }
 
   file { $::burp::ui::config_file :
     content => template('burp/burp-ui.conf.erb'),
-    owner   => 'burp-ui',
-    group   => 'burp-ui',
+    owner   => $::burp::ui::user,
+    group   => $::burp::ui::group,
     mode    => '0640',
+  }
+
+  file { $::burp::ui::log_file :
+    owner => $::burp::ui::user,
+    group => $::burp::ui::group,
+    mode  => '0644',
   }
 
 }

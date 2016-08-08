@@ -9,10 +9,13 @@ class burp::ui (
   $manage_service              = true,
   $service_provider            = 'builtin',
   $service_builtin_init_script = 'sysv',
+  $service_builtin_binary_path = $::burp::params::builtin_binary_path,
+
 
   # Config
   $manage_user                 = true,
   $user                        = 'burp-ui',
+  $group                       = 'burp-ui',
   $user_home                   = '/var/lib/burp-ui',
 
   $config_folder               = '/etc/burp-ui',
@@ -20,7 +23,8 @@ class burp::ui (
 
   $configuration               = {},
 
-) {
+) inherits ::burp::ui::params {
+
 
   class { '::burp::ui::install' :
     package_provider  => $package_provider,
@@ -50,8 +54,9 @@ class burp::ui (
 
   class { ::burp::ui::service :
     manage_service      => $manage_service,
-    service_provider    => 'builtin',
+    service_provider    => $service_provider,
     builtin_init_script => $service_builtin_init_script,
+    builtin_binary_path => $service_builtin_binary_path,
   }
 
   Class['::burp::ui::install'] ->
