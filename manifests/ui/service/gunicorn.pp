@@ -17,7 +17,7 @@ class burp::ui::service::gunicorn (
 
   python::gunicorn { 'burpui' :
     dir               => '/tmp',
-    bind              => '127.0.0.1:5003',
+    bind              => "${::burp::ui::config::configuration['Global']['bind']}:${::burp::ui::config::configuration['Global']['port']}",
     owner             => $::burp::ui::user,
     group             => $::burp::ui::group,
     appmodule         => "burpui:init(conf=\"${::burp::ui::config_file}\",logfile=\"${::burp::ui::log_file}\",verbose=4,debug=True)",
@@ -26,7 +26,6 @@ class burp::ui::service::gunicorn (
     accesslog         => '/var/log/gunicorn/burp_access.log',
     errorlog          => '/var/log/gunicorn/burp_error.log',
     log_level         => 'error',
-    #template          => 'python/gunicorn.erb',
     args              => [
       '--preload',
       '--worker-class=gevent',
