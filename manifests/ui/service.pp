@@ -18,6 +18,11 @@ class burp::ui::service (
         class { '::burp::ui::service::gunicorn' : }
       }
 
+      'apache' : {
+        warning('Implementation of burpui on apache is not fully tested yet')
+        class { '::burp::ui::service::apache' : }
+      }
+
       default : {
         fail("Unsupported burp-ui service : ${service_provider}")
       }
