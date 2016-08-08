@@ -1,10 +1,12 @@
 class burp::ui::install (
-  $package_provider  = 'wheelhouse',
-  $wheelhouse_source = 'puppet:///modules/burp/ui-wheelhouse',
-  $wheelhouse_path   = '/opt/burp-ui_wheelhouse',
-  $burpui_version    = '0.2.1',
-  $ldap3_version     = '1.2.2',
-  $gevent_version    = '1.0.2',
+  $package_provider     = 'wheelhouse',
+  $wheelhouse_source    = 'puppet:///modules/burp/ui-wheelhouse',
+  $wheelhouse_path      = '/opt/burp-ui_wheelhouse',
+  $burpui_version       = '0.2.1',
+  $ldap3_version        = '1.2.2',
+  $gevent_version       = '1.0.2',
+  $redis_version        = '2.10.5',
+  $flasksession_version = '0.3.0',
 ) {
 
   if $burp::ui::manage_package {
