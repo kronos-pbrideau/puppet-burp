@@ -1,12 +1,14 @@
 class burp::ui::install (
-  $package_provider     = 'wheelhouse',
-  $wheelhouse_source    = 'puppet:///modules/burp/ui-wheelhouse',
-  $wheelhouse_path      = '/opt/burp-ui_wheelhouse',
-  $burpui_version       = '0.3.0',
-  $ldap3_version        = '1.4.0',
-  $gevent_version       = '1.1.2',
-  $redis_version        = '2.10.5',
-  $flasksession_version = '0.3.0',
+  $package_provider        = 'wheelhouse',
+  $wheelhouse_source       = 'puppet:///modules/burp/ui-wheelhouse',
+  $wheelhouse_path         = '/opt/burp-ui_wheelhouse',
+  $burpui_version          = '0.3.0',
+  $ldap3_version           = '1.4.0',
+  $gevent_version          = '1.1.2',
+  $redis_version           = '2.10.5',
+  $flasksession_version    = '0.3.0',
+  $flasksqlalchemy_version = '2.1',
+  $flaskmigrate_version    = '2.0.0',
 ) {
 
   if $burp::ui::manage_package {
@@ -56,6 +58,15 @@ class burp::ui::install (
           }
           burp_pip_install { 'Flask-Session' :
             version => $flasksession_version,
+          }
+        }
+
+        if $::burp::ui::sql {
+          burp_pip_install { 'Flask-SQLAlchemy' :
+            version => $flasksqlalchemy_version,
+          }
+          burp_pip_install { 'Flask-Migrate' :
+            version => $flaskmigrate_version,
           }
         }
       }

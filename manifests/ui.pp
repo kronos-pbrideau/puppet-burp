@@ -11,6 +11,7 @@ class burp::ui (
   $service_builtin_init_script = 'sysv',
   $service_builtin_binary_path = $::burp::params::builtin_binary_path,
   $redis                       = false,
+  $sql                         = false,
 
   # Config
   $manage_user                 = true,
