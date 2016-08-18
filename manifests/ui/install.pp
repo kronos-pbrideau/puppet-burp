@@ -3,7 +3,7 @@ class burp::ui::install (
   $wheelhouse_source    = 'puppet:///modules/burp/ui-wheelhouse',
   $wheelhouse_path      = '/opt/burp-ui_wheelhouse',
   $burpui_version       = '0.3.0',
-  $ldap3_version        = '1.4.2',
+  $ldap3_version        = '1.4.0',
   $gevent_version       = '1.1.2',
   $redis_version        = '2.10.5',
   $flasksession_version = '0.3.0',
