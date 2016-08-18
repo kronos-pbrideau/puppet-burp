@@ -16,10 +16,20 @@ class burp::ui::install (
       #  wheelhouse provider
       #
       'wheelhouse' : {
-
         if $wheelhouse_source == undef {
           fail('You must provide your own path for wheelhouse_source')
         }
+
+        $service_name = $::burp::ui::service_provider ? {
+          'gunicorn' => 'gunicorn',
+          'builtin'  => 'burp-ui',
+        }
+
+        Burp_pip_install {
+          wheelhouse_path => $wheelhouse_path,
+          service         => $service_name,
+        }
+
         # NOTE: the wheelhouse was built with
         # pip wheel burp-ui
         include ::python
@@ -28,69 +38,24 @@ class burp::ui::install (
           recurse => true,
         }
 
-        case $::burp::ui::service_provider {
-          'gunicorn' : {
-            Exec['install burp-ui'] ~> Service['gunicorn']
-            Exec['install ldap3'] ~> Service['gunicorn']
-            Exec['install gevent'] ~> Service['gunicorn']
-            if $::burp::ui::redis {
-              Exec['install redis'] ~> Service['gunicorn']
-              Exec['install Flask-Session'] ~> Service['gunicorn']
-            }
-
-          }
-          'builtin' : {
-            Exec['install burp-ui'] ~> Service['burp-ui']
-            Exec['install ldap3'] ~> Service['burp-ui']
-            Exec['install gevent'] ~> Service['burp-ui']
-            if $::burp::ui::redis {
-              Exec['install redis'] ~> Service['burp-ui']
-              Exec['install Flask-Session'] ~> Service['burp-ui']
-            }
-          }
+        burp_pip_install { 'burp-ui' :
+          version => $burpui_version,
         }
 
-        exec { 'install burp-ui' :
-          require => [
-            File[$wheelhouse_path],
-            Package['python-pip'],
-          ],
-          command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} burp-ui",
-          unless  => "pip show burp-ui | grep '^Version: ${burpui_version}'",
+        burp_pip_install { 'ldap3' :
+          version => $ldap3_version,
         }
-        exec { 'install ldap3' :
-          require => [
-            File[$wheelhouse_path],
-            Package['python-pip'],
-          ],
-          command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} ldap3",
-          unless  => "pip show ldap3 | grep '^Version: ${ldap3_version}'",
-        }
-        exec { 'install gevent' :
-          require => [
-            File[$wheelhouse_path],
-            Package['python-pip'],
-          ],
-          command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} gevent",
-          unless  => "pip show gevent | grep '^Version: ${gevent_version}'",
+
+        burp_pip_install { 'gevent' :
+          version => $gevent_version,
         }
 
         if $::burp::ui::redis {
-          exec { 'install redis' :
-            require => [
-              File[$wheelhouse_path],
-              Package['python-pip'],
-            ],
-            command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} redis",
-            unless  => "pip show redis | grep '^Version: ${redis_version}'",
+          burp_pip_install { 'redis' :
+            version => $redis_version,
           }
-          exec { 'install Flask-Session' :
-            require => [
-              File[$wheelhouse_path],
-              Package['python-pip'],
-            ],
-            command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} Flask-Session",
-            unless  => "pip show Flask-Session | grep '^Version: ${flasksession_version}'",
+          burp_pip_install { 'Flask-Session' :
+            version => $flasksession_version,
           }
         }
       }
@@ -109,4 +74,21 @@ class burp::ui::install (
 
   }
 
+}
+
+define burp_pip_install(
+  $package = $name,
+  $wheelhouse_path,
+  $version,
+  $service,
+) {
+  exec { "install ${package}" :
+    require => [
+      File[$wheelhouse_path],
+      Package['python-pip'],
+    ],
+    command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} ${package}",
+    unless  => "pip show ${package} | grep '^Version: ${version}'",
+    notify  => Service[$service],
+  }
 }
