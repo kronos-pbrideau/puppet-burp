@@ -9,6 +9,7 @@ class burp::ui::install (
   $flasksession_version    = '0.3.0',
   $flasksqlalchemy_version = '2.1',
   $flaskmigrate_version    = '2.0.0',
+  $celery_version          = '3.1.23',
 ) {
 
   if $burp::ui::manage_package {
@@ -58,6 +59,11 @@ class burp::ui::install (
           }
           burp_pip_install { 'Flask-Session' :
             version => $flasksession_version,
+          }
+        }
+        if $::burp::ui::celery {
+          burp_pip_install { 'Celery' :
+            version => $celery_version,
           }
         }
 

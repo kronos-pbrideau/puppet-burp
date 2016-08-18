@@ -12,6 +12,7 @@ class burp::ui (
   $service_builtin_binary_path = $::burp::params::builtin_binary_path,
   $redis                       = false,
   $sql                         = false,
+  $celery                      = false,
 
   # Config
   $manage_user                 = true,
@@ -27,6 +28,9 @@ class burp::ui (
 
 ) inherits ::burp::ui::params {
 
+  if ( $celery and ! $redis ) {
+    fail('you must activate redis when using celery')
+  }
 
   class { '::burp::ui::install' :
     package_provider  => $package_provider,
