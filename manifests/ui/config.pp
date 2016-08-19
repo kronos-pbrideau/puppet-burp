@@ -37,4 +37,33 @@ class burp::ui::config (
     mode  => '0644',
   }
 
+  if $::burp::ui::sql {
+    if $configuration['Production']['database'] == undef {
+      fail('You must set database setting in [Production] section')
+    } else {
+      $database_backend = regsubst($configuration['Production']['database'], ':.*$', '')
+      case $database_backend {
+        'sqlite' : {
+          $db_file = regsubst($configuration['Production']['database'], '^sqlite:///', '')
+        }
+        #'mysql' : {}
+        #'postgresql' : {}
+        #'oracle': {}
+        #'mssql' : {}
+        default: {
+          fail('Untested backend for now')
+        }
+      }
+    }
+
+    exec { 'Install burpui database' :
+      path    => ['/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/', '/usr/local/bin', '/usr/local/sbin'],
+      command => "bui-manage -c ${::burp::ui::config_file} -- db upgrade",
+      user    => $::burp::ui::user,
+      creates => $db_file,
+    }
+  }
+
+
+
 }
