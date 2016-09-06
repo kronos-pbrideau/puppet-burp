@@ -9,7 +9,7 @@ class burp::ui (
   $manage_service              = true,
   $service_provider            = 'builtin',
   $service_builtin_init_script = 'sysv',
-  $service_builtin_binary_path = $::burp::params::builtin_binary_path,
+  $service_builtin_binary_path = $::burp::ui::params::builtin_binary_path,
   $redis                       = false,
   $sql                         = false,
   $celery                      = false,
