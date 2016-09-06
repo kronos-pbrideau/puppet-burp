@@ -1,16 +1,12 @@
-class burp::ui::service (
-  $manage_service,
-  $service_provider,
-  $builtin_init_script = undef,
-  $builtin_binary_path = undef,
-) {
+class burp::ui::service () {
 
-  if $manage_service {
-    case $service_provider {
+  if $::burp::ui::manage_service {
+    case $::burp::ui::service_provider {
       'builtin' : {
-        class { '::burp::ui::service::builtin' :
-          init_script => $builtin_init_script,
-          binary_path => $builtin_binary_path,
+        ::burp::ui::service::builtin { 'burp-ui' :
+          init_script => $::burp::ui::service_builtin_init_script,
+          binary_path => $::burp::ui::service_builtin_binary_path,
+          daemon_args => "--config $::burp::ui::config_file --logfile $::burp::ui::log_file",
         }
       }
 
@@ -24,10 +20,9 @@ class burp::ui::service (
       }
 
       default : {
-        fail("Unsupported burp-ui service : ${service_provider}")
+        fail("Unsupported burp-ui service : ${::burp::ui::service_provider}")
       }
     }
   }
 
 }
-

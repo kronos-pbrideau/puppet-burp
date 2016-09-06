@@ -58,12 +58,7 @@ class burp::ui (
     configuration => $_configuration,
   }
 
-  class { ::burp::ui::service :
-    manage_service      => $manage_service,
-    service_provider    => $service_provider,
-    builtin_init_script => $service_builtin_init_script,
-    builtin_binary_path => $service_builtin_binary_path,
-  }
+  class { ::burp::ui::service : }
 
   Class['::burp::ui::install'] ->
     Class['::burp::ui::config'] ->

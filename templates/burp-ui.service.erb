@@ -1,11 +1,11 @@
 [Unit]
-Description=burp-ui init script
+Description=<%= @service_name %> init script
 After=network.target
 
 [Service]
 User=<%= scope.lookupvar('burp::ui::user') %>
 Group=<%= scope.lookupvar('burp::ui::group') %>
-ExecStart=<%= @binary_path %> --config <%= scope.lookupvar('burp::ui::config_file')%> --logfile /var/log/burp/ui.log -vvvv --debug
+ExecStart=<%= @binary_path %> <%= @daemon_args %>
 Type=idle
 
 [Install]

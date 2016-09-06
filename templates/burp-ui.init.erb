@@ -1,6 +1,6 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          burp-ui
+# Provides:          <%= @service_name %>
 # Required-Start:    $network $local_fs $remote_fs
 # Required-Stop:     $network $local_fs $remote_fs
 # Default-Start:     2 3 4 5
@@ -13,12 +13,12 @@
 
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC=burp-ui          # Introduce a short description here
-NAME=burp-ui          # Introduce the short server's name here
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/sbin:/usr/local/bin
+DESC=<%= @service_name %>          # Introduce a short description here
+NAME=<%= @service_name %>          # Introduce the short server's name here
 DAEMON=<%= @binary_path %> # Introduce the server's location here
-DAEMON_ARGS="--config <%= scope.lookupvar('burp::ui::config_file')%> --logfile <%= scope.lookupvar('burp::ui::log_file')%>"
-PIDFILE=/var/run/burp.ui.pid
+DAEMON_ARGS=""
+PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 UID=<%= scope.lookupvar('burp::ui::user') %>
 GID=<%= scope.lookupvar('burp::ui::group') %>
