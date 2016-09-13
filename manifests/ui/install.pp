@@ -1,7 +1,4 @@
 class burp::ui::install (
-  $package_provider        = 'wheelhouse',
-  $wheelhouse_source       = 'puppet:///modules/burp/ui-wheelhouse',
-  $wheelhouse_path         = '/opt/burp-ui_wheelhouse',
   $burpui_version          = '0.3.0',
   $ldap3_version           = '1.4.0',
   $gevent_version          = '1.1.2',
@@ -14,30 +11,21 @@ class burp::ui::install (
 
   if $burp::ui::manage_package {
 
-    case $package_provider {
+    case $burp::ui::package_provider {
       #
       #  wheelhouse provider
       #
       'wheelhouse' : {
-        if $wheelhouse_source == undef {
-          fail('You must provide your own path for wheelhouse_source')
-        }
-
-        $service_name = $::burp::ui::service_provider ? {
-          'gunicorn' => 'gunicorn',
-          'builtin'  => 'burp-ui',
-        }
 
         Burp_pip_install {
-          wheelhouse_path => $wheelhouse_path,
-          service         => $service_name,
+          wheelhouse_path   => $::burp::ui::wheelhouse_path,
         }
 
         # NOTE: the wheelhouse was built with
         # pip wheel burp-ui
         include ::python
-        file { $wheelhouse_path :
-          source  => $wheelhouse_source,
+        file { $::burp::ui::wheelhouse_path :
+          source  => $::burp::ui::wheelhouse_source,
           recurse => true,
         }
 
@@ -53,7 +41,7 @@ class burp::ui::install (
           version => $gevent_version,
         }
 
-        if $::burp::ui::redis {
+        if $::burp::ui::install_redis {
           burp_pip_install { 'redis' :
             version => $redis_version,
           }
@@ -61,13 +49,13 @@ class burp::ui::install (
             version => $flasksession_version,
           }
         }
-        if $::burp::ui::celery {
+        if $::burp::ui::install_celery {
           burp_pip_install { 'Celery' :
             version => $celery_version,
           }
         }
 
-        if $::burp::ui::sql {
+        if $::burp::ui::install_sql {
           burp_pip_install { 'Flask-SQLAlchemy' :
             version => $flasksqlalchemy_version,
           }
@@ -97,7 +85,7 @@ define burp_pip_install(
   $package = $name,
   $wheelhouse_path,
   $version,
-  $service,
+  $service_to_notify = undef,
 ) {
   exec { "install ${package}" :
     require => [
@@ -106,6 +94,13 @@ define burp_pip_install(
     ],
     command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} ${package}",
     unless  => "pip show ${package} | grep '^Version: ${version}'",
-    notify  => Service[$service],
+  }
+
+  if $::burp::ui::server::manage_service {
+    $server_service_name = $::burp::ui::server::service_provider ? {
+      'gunicorn' => 'gunicorn',
+      'builtin'  => 'burp-ui',
+    }
+    Exec["install ${package}"] ~> Service[$server_service_name]
   }
 }
