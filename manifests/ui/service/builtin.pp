@@ -39,17 +39,13 @@ define burp::ui::service::builtin (
       default   : { fail('init_script must be one of sysv or systemd') }
     }
 
-    Exec["${service_name}-systemd-reload"] ~> Service[$service_name]
-
-    $ensure_service = $ensure ? {
-      'present' => 'running',
-      'absent'  => 'stopped',
-    }
-
-    service { $service_name :
-      ensure    => $ensure_service,
-      require   => File["${service_name} init"],
-      enable    => true,
+    if $ensure == 'present' {
+      service { $service_name :
+        ensure  => 'running',
+        require => File["${service_name} init"],
+        enable  => true,
+      }
+      Exec["${service_name}-systemd-reload"] ~> Service[$service_name]
     }
 
     exec { "${service_name}-systemd-reload":
