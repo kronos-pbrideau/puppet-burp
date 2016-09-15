@@ -2,7 +2,7 @@ class burp::ui::server (
   # Services
   $manage_service              = true,
   $service_provider            = 'builtin',
-  $service_builtin_init_script = 'sysv',
+  $service_builtin_init_script = $::burp::ui::params::builtin_init_script,
   $service_builtin_binary_path = $::burp::ui::params::builtin_server_binary_path,
 
   # Config
