@@ -9,6 +9,8 @@ class burp::ui::server (
   $config_file                 = "${::burp::ui::config_dir}/burp-ui.conf",
   $log_file                    = "${::burp::ui::log_dir}/server.log",
   $configuration               = {},
+
+  $debug_log                   = false,
 ) inherits ::burp::ui::params {
 
   include burp::ui
@@ -71,19 +73,24 @@ class burp::ui::server (
   if $manage_service {
     case $service_provider {
       'builtin' : {
+        if $debug_log {
+          $debur_args = '-vvvv --debug'
+        }
         ::burp::ui::service::builtin { 'burp-ui' :
           init_script => $service_builtin_init_script,
           binary_path => $service_builtin_binary_path,
-          daemon_args => "--config $config_file --logfile $log_file",
+          daemon_args => "--config $config_file --logfile $log_file $debug_args",
         }
         File[$config_file] ~> Service['burp-ui']
-        class { '::burp::ui::service::gunicorn' : 
+        class { '::burp::ui::service::gunicorn' :
           ensure => 'absent',
         }
       }
 
       'gunicorn' : {
-        class { '::burp::ui::service::gunicorn' : }
+        class { '::burp::ui::service::gunicorn' :
+          debug_log => $debug_log,
+        }
         ::burp::ui::service::builtin { 'burp-ui' :
           ensure => 'absent',
         }
