@@ -1,5 +1,6 @@
 class burp::ui::service::gunicorn (
-  $ensure = 'present',
+  $ensure    = 'present',
+  $debug_log = false,
 ) {
 
   # service { 'burp-ui' :
@@ -16,13 +17,17 @@ class burp::ui::service::gunicorn (
   #   notify  => Exec['burp-ui-systemd-reload'],
   # }
 
+  if $debug_log {
+    $debug_args = ',verbose=4,debug=True'
+  }
+
   python::gunicorn { 'burpui' :
     ensure    => $ensure,
     dir       => '/tmp',
     bind      => "${::burp::ui::server::_configuration['Global']['bind']}:${::burp::ui::server::_configuration['Global']['port']}",
     owner     => $::burp::ui::user,
     group     => $::burp::ui::group,
-    appmodule => "burpui:create_app(conf=\"${::burp::ui::server::config_file}\",logfile=\"${::burp::ui::server::log_file}\",verbose=4,debug=True)",
+    appmodule => "burpui:create_app(conf=\"${::burp::ui::server::config_file}\",logfile=\"${::burp::ui::server::log_file}\"${debug_args})",
     timeout   => 30,
     workers   => 2,
     accesslog => '/var/log/gunicorn/burp_access.log',
