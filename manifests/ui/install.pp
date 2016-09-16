@@ -23,10 +23,19 @@ class burp::ui::install (
 
         # NOTE: the wheelhouse was built with
         # pip wheel burp-ui
+        #
+        # There is an incompatibility with the wheel of cryptography built on Centos
+        #  you must change the created wheel:
+        #    $ mv cffi-1.8.2-cp27-cp27mu-linux_x86_64.whl cffi-1.8.2-cp27-none-linux_x86_64.whl
+        #    $ mv cryptography-1.5-cp27-cp27mu-linux_x86_64.whl cryptography-1.5-cp27-none-linux_x86_64.whl
+        #  OR install the latest pip on the centos server
+        #    $ pip install --upgrade pip
+
         include ::python
         file { $::burp::ui::wheelhouse_path :
           source  => $::burp::ui::wheelhouse_source,
           recurse => true,
+          purge   => true,
         }
 
         burp_pip_install { 'burp-ui' :
@@ -92,7 +101,7 @@ define burp_pip_install(
       File[$wheelhouse_path],
       Package['python-pip'],
     ],
-    command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} ${package}",
+    command => "pip install --upgrade --use-wheel --no-index --find-link=${wheelhouse_path} --find-link=${wheelhouse_path}/${::osfamily} ${package}",
     unless  => "pip show ${package} | grep '^Version: ${version}'",
   }
 
